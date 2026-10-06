@@ -3356,9 +3356,11 @@
             },
 
             renderLearn(ex, area, footer) {
+                const session = this.state.activeSession;
                 const chunk = ex.data;
-                const imgUrl = ex.image || this.state.activeSession?.stage?.image;
-                const posName = ex.positionName || this.state.activeSession?.stage?.positionName || ex.stageTitle || 'Prayer Position';
+                const imgUrl = ex.image || session?.stage?.image;
+                const posName = ex.positionName || session?.stage?.positionName || ex.stageTitle || 'Prayer Position';
+                const isFatihah = (session?.stage?.id === 4) || (session?.stage?.title && session.stage.title.includes('Al-Fatihah')) || (ex.stageTitle && ex.stageTitle.includes('Al-Fatihah'));
                 let html = '';
                 if(ex.intro) {
                     html += `<div class="bg-blue-50 border-l-4 border-blue-500 p-2 sm:p-3 rounded-2xl text-blue-900 mb-1.5 sm:mb-2 text-xs sm:text-sm md:text-base font-bold flex items-center shadow-sm w-full flex-shrink-0" dir="ltr"><span class="text-lg mr-2">💡</span> ${ex.intro}</div>`;
@@ -3371,7 +3373,7 @@
                                 <span>📖</span> Read & Learn
                             </span>
                             <span class="text-xs sm:text-sm font-bold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                                ${this.state.activeSession?.stage?.title || 'Salah Adhkar'}
+                                ${session?.stage?.title || 'Salah Adhkar'}
                             </span>
                         </div>
                         
@@ -3411,7 +3413,7 @@
                                     </div>
                                 </div>
 
-                                ${chunk.tafsir && (session.stage?.id === 4 || (session.stage?.title && session.stage.title.includes('Al-Fatihah'))) ? `
+                                ${chunk.tafsir && isFatihah ? `
                                 <div class="bg-amber-50/80 rounded-2xl sm:rounded-3xl p-2.5 sm:p-3.5 border border-amber-200 border-l-[8px] sm:border-l-[12px] border-l-amber-500 text-left shadow-md flex-shrink min-h-0 overflow-y-auto max-h-[14vh]" dir="ltr">
                                     <p class="text-xs sm:text-sm font-black text-amber-800 uppercase tracking-wider mb-0.5 flex items-center gap-1">
                                         <span>📖</span> Tafsir / Explanation (Quran.com)
@@ -3906,7 +3908,7 @@
                             state.selected2.el.classList.remove('flipped');
                             state.selected1 = null;
                             state.selected2 = null;
-                        }, 1000);
+                        }, 3000);
                         this.handleWrong();
                     }
                 }
