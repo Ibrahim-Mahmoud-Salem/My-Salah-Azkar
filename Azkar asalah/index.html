@@ -3890,18 +3890,20 @@
                     state.selected2 = { el, id };
                     
                     if(state.selected1.id === state.selected2.id) {
+                        const c1 = state.selected1;
+                        const c2 = state.selected2;
+                        this.playSound(800, 1200, 0.15, 0.35);
                         setTimeout(() => {
-                            state.selected1.el.classList.add('matched');
-                            state.selected2.el.classList.add('matched');
+                            c1.el.classList.add('matched');
+                            c2.el.classList.add('matched');
                             state.pairsLeft--;
                             state.selected1 = null;
                             state.selected2 = null;
-                            this.playSound(800, 1200, 0.15, 0.35);
                             
                             if(state.pairsLeft === 0) {
                                 setTimeout(() => this.handleCorrect(), 600);
                             }
-                        }, 600);
+                        }, 3000);
                     } else {
                         setTimeout(() => {
                             state.selected1.el.classList.remove('flipped');
