@@ -2648,8 +2648,8 @@
                 if (!ex) return;
 
                 // Log mistake for review, 0 points added
-                if (ex.data && !session.mistakesLog.includes(ex.data)) {
-                    session.mistakesLog.push(ex.data);
+                if (ex && !session.mistakesLog.includes(ex)) {
+                    session.mistakesLog.push(ex);
                 }
                 session.combo = 0;
                 this.updateGamificationUI();
@@ -3084,39 +3084,7 @@
                 if(session.currentIndex >= session.sequence.length) {
                     if (session.mistakesLog.length > 0) {
                         this.showMessage("Let's quickly practice the ones you missed to make sure you've mastered them!", "Practice Makes Perfect");
-                        const remedial = [];
-                        const uniqueMistakes = [...new Set(session.mistakesLog)];
-                        uniqueMistakes.forEach(chunk => {
-                            const chunkIdx = session.stage.chunks ? session.stage.chunks.findIndex(c => c.ar === chunk.ar) : 0;
-                            const fixedKey = `${session.stage.id}_${chunkIdx >= 0 ? chunkIdx : 0}`;
-                            const fixed = (typeof FIXED_EXERCISE_DATA !== 'undefined' && FIXED_EXERCISE_DATA[fixedKey]) ? FIXED_EXERCISE_DATA[fixedKey] : null;
-                            const posName = session.stage.positionName || session.stage.title;
-                            const rep = session.stage.repetition || null;
-                            remedial.push({ 
-                                type: 'learn', 
-                                data: chunk, 
-                                image: session.stage.image, 
-                                stageTitle: session.stage.title,
-                                positionName: posName,
-                                repetition: rep
-                            });
-                            remedial.push({ 
-                                type: 'mcq-meaning', 
-                                data: chunk, 
-                                stageTitle: session.stage.title,
-                                positionName: posName,
-                                repetition: rep,
-                                options: fixed ? fixed.meaningOptions : [chunk.en, ...this.getUniqueDistractors(chunk.en, 'en', 3)],
-                                correctIndex: fixed ? fixed.meaningCorrectIndex : 0
-                            });
-                            remedial.push({ 
-                                type: 'order-words', 
-                                data: chunk, 
-                                stageTitle: session.stage.title,
-                                positionName: posName,
-                                repetition: rep
-                            });
-                        });
+                        const remedial = session.mistakesLog.map(ex => ({ ...ex }));
                         session.sequence = session.sequence.concat(remedial);
                         session.mistakesLog = []; 
                     } else {
@@ -3200,11 +3168,14 @@
 
             handleWrong(chunkData) {
                 const s = this.state.activeSession;
+                if (!s) return;
                 s.combo = 0;
                 s.hearts--;
                 
-                if (chunkData && !s.mistakesLog.includes(chunkData)) {
-                    s.mistakesLog.push(chunkData); 
+                const currentEx = (s.sequence && s.currentIndex < s.sequence.length) ? s.sequence[s.currentIndex] : null;
+                const mistakeItem = currentEx || chunkData;
+                if (mistakeItem && !s.mistakesLog.includes(mistakeItem)) {
+                    s.mistakesLog.push(mistakeItem); 
                 }
 
                 if (s.hearts <= 0) {
